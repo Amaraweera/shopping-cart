@@ -39,7 +39,7 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @Route("/product/addProd", name="add_prod")
+     * @Route("/product/add", name="add")
      */
     public function addProd(Request $request): Response
     {
@@ -64,7 +64,7 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @Route("/product/editProd/{id}", name="edit_prod")
+     * @Route("/product/edit/{id}", name="edit")
      */
     public function editProd(Request $request): Response
     {

@@ -21,6 +21,7 @@ class Prod
     /**
      * @ORM\Column(type="string", length=225)
      * @Assert\NotBlank
+     * @Assert\Regex("/^[a-z\-0-9]+$/i")
      */
     private $name;
 

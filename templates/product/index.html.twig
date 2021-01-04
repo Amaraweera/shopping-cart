@@ -6,7 +6,7 @@
 <div class="example-wrapper">
     <div class="col-sm-12">
         <h3>Product List</h3>
-        <a href="{{ path('add_prod') }}" class="btn btn-sm btn-primary">
+        <a href="{{ path('add') }}" class="btn btn-sm btn-primary">
                 <i class="fa fa-edit" aria-hidden="true"></i> Add Product
         </a>
         <table class="table table-striped table-middle-aligned">
@@ -28,7 +28,7 @@
                             <td>{{ prod.price|number_format(2, '.', ',') }}</td>
                             <td class="text-center"><input type="number" id="qty" name="qty" required="required"></td>
                             <td class="text-center">
-                                <a href="{{ path('edit_prod', {id: prod.id}) }}" class="btn btn-sm btn-primary">
+                                <a href="{{ path('edit', {id: prod.id}) }}" class="btn btn-sm btn-primary">
                                     <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                 </a>
                                 <button type="submit" class="btn btn-sm btn-primary btn-success">
