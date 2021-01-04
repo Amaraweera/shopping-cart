@@ -32,9 +32,9 @@ class ProductController extends AbstractController
         ])->getForm();
 
         return $this->render('product/index.html.twig', [
-            'form' =>  $form->createView(),
+            'form'  =>  $form->createView(),
             'prods' => $prods,
-            "cart" => $this->session->get('cart_item')
+            "cart"  => $this->session->get('cart_item')
         ]);
     }
 
@@ -47,9 +47,11 @@ class ProductController extends AbstractController
         $form = $this->createForm(ProductType::class, $prod);
 
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
-            $product = $form->getData();
+            $product       = $form->getData();
             $entityManager = $this->getDoctrine()->getManager();
+
             $entityManager->persist($product);
             $entityManager->flush();
 
@@ -72,8 +74,9 @@ class ProductController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $product = $form->getData();
+            $product       = $form->getData();
             $entityManager = $this->getDoctrine()->getManager();
+
             $entityManager->persist($product);
             $entityManager->flush();
 
@@ -98,11 +101,18 @@ class ProductController extends AbstractController
 
         $prod = $this->getDoctrine()->getRepository(Prod::class)->find($prodId);
 
-        $cartAr[$prodId]['prod_id'] = $prodId;
-        $cartAr[$prodId]['prod_name'] = $prod->getName();
-        $cartAr[$prodId]['prod_qty'] = $qty;
-        $cartAr[$prodId]['unit_price'] = $prod->getPrice();
-        $cartAr[$prodId]['item_total'] = $prod->getPrice() * $qty;
+        if (isset($cartAr[$prodId])) {
+            $qty = $cartAr[$prodId]['prod_qty'] + $qty;
+
+            $cartAr[$prodId]['prod_qty']   = $qty;
+            $cartAr[$prodId]['item_total'] = $prod->getPrice() * $qty;
+        } else {
+            $cartAr[$prodId]['prod_id']    = $prodId;
+            $cartAr[$prodId]['prod_name']  = $prod->getName();
+            $cartAr[$prodId]['prod_qty']   = $qty;
+            $cartAr[$prodId]['unit_price'] = $prod->getPrice();
+            $cartAr[$prodId]['item_total'] = $prod->getPrice() * $qty;
+        }
 
         $this->session->set('cart_item', $cartAr);
 
@@ -119,11 +129,23 @@ class ProductController extends AbstractController
 
         $cartAr = $this->session->get('cart_item');
 
-        if ($action == 'delete_item') { // Delete selected item
+        // if action is "delete_item" delete one item else delete all items
+        if ($action === 'delete_item') {
             unset($cartAr[$id]);
             $this->session->set('cart_item', $cartAr);
-        } else // Delete all items
+        } else
             $this->session->remove('cart_item');
+
+        return $this->redirectToRoute('product');
+    }
+
+    /**
+     * @Route("/product/checkout", name="checkout")
+     */
+    public function checkout(Request $request): Response
+    {
+        $cartAr = $this->session->get('cart_item');
+
 
         return $this->redirectToRoute('product');
     }
