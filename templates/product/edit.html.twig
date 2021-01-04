@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+{% block title %}Hello ProductController!{% endblock %}
+
+{% block body %}
+<h1>Update product</h1>
+{{ form_start(form) }}
+        {{ form_row(form.name) }}
+        {{ form_row(form.price) }}
+        {{ form_row(form.description) }}
+        <button type="submit" class="btn btn-sm btn-primary">
+            <i class="fa fa-save" aria-hidden="true"></i> Update
+        </button>
+        <a href="{{ path('product')}}" class="btn btn-sm btn-danger">
+            Cancel
+        </a>
+    {{ form_end(form) }}
+</html>
+{% endblock %}

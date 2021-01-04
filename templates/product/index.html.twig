@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CART{% endblock %}
+
+{% block body %}
+<div class="example-wrapper">
+    <div class="col-sm-12">
+        
+    </div>
+    <div class="col-sm-12">
+        <h3>Cart</h3>
+        <span>
+            <a href="{{ path('add_prod') }}" class="btn btn-sm btn-primary">
+                <i class="fa fa-edit" aria-hidden="true"></i> Add Product
+            </a>
+            <a href="{{ path('delete_item', {id: 0,action: 'delete_all'}) }}" class="btn btn-sm btn-danger pull-right">
+                <i class="fa fa-edit" aria-hidden="true"></i> Empty Cart
+            </a>
+        </span>
+
+        <table class="table table-striped table-middle-aligned">
+            <thead>
+                <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Price</th>
+                    <th scope="col" class="text-center">Quantity</th>
+                    <th scope="col" class="text-center">Total</th>
+                    <th scope="col" class="text-center"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if cart is defined %}
+                {% set total = 0 %}
+                {% for cartItem in cart %}
+                <tr>
+                    <td>{{ cartItem.prod_name }}</td>
+                    <td>${{ cartItem.unit_price }} .USD</td>
+                    <td>{{ cartItem.prod_qty }}</td>
+                    <td>{{ cartItem.item_total }}</td>
+                    <td>
+                        <a href="{{ path('delete_item', {id: cartItem.prod_id,action: 'delete_item'}) }}" class="btn btn-sm btn-danger">
+                        <i class="fa fa-edit" aria-hidden="true"></i> X
+                    </a>
+                    </td>
+                </tr>
+                {% set total = total + cartItem.item_total %}
+                {% endfor %}
+                <tr>
+                    <td colSpan="3">Total</td>
+                    <td>{{ total }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                <td colSpan="4"> 
+                    <a href="{{ path('product')}}" class="btn btn-sm btn-primary">
+                    Checkout
+                    </a>
+                </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <h3>Product List</h3>
+        <table class="table table-striped table-middle-aligned">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col" class="text-center">Unit Price</th>
+                    <th scope="col" class="text-center">Qty</th>
+                    <th scope="col" class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            {% for prod in prods %}
+            {{ form_start(form, {'action': path('add_to_cart'), 'method': 'POST'}) }}
+                <tr>
+                    <td>{{ prod.name }}</td>
+                    <td>{{ prod.description }}</td>
+                    <td>${{ prod.price }} .USD</td>
+                    <td><input type="number" id="qty" name="qty" required="required"></td>
+                    <td>
+                    <a href="{{ path('edit_prod', {id: prod.id}) }}" class="btn btn-sm btn-primary">
+                        <i class="fa fa-edit" aria-hidden="true"></i> Edit
+                    </a>
+                    <button type="submit" class="btn btn-sm btn-primary btn-success">
+                        <i class="fa fa-save" aria-hidden="true"></i> Add to cart
+                    </button></td>
+                    <input type="hidden" id="prod_id" name="id" value="{{prod.id}}">
+                </tr>
+                {{ form_end(form) }}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
