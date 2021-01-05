@@ -9,6 +9,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Prod;
 use App\Form\ProductType;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class ProductController extends AbstractController
 {
@@ -24,7 +27,7 @@ class ProductController extends AbstractController
      */
     public function index(): Response
     {
-        $prods = $this->getDoctrine()->getRepository(Prod::class)->findAll();
+        $products = $this->getDoctrine()->getRepository(Prod::class)->findAll();
 
         $form = $this->createFormBuilder([
             'action' => $this->generateUrl('add_to_cart'),
@@ -33,7 +36,7 @@ class ProductController extends AbstractController
 
         return $this->render('product/index.html.twig', [
             'form'  =>  $form->createView(),
-            'prods' => $prods,
+            'products' => $products,
             "cart"  => $this->session->get('cart_item')
         ]);
     }
@@ -41,10 +44,15 @@ class ProductController extends AbstractController
     /**
      * @Route("/product/add", name="add")
      */
-    public function addProd(Request $request): Response
+    public function addProduct(Request $request): Response
     {
-        $prod = new Prod();
-        $form = $this->createForm(ProductType::class, $prod);
+        $product = new Prod();
+
+        $form = $this->createFormBuilder($product)
+            ->add('name', TextType::class)
+            ->add('price', NumberType::class)
+            ->add('description', TextareaType::class)
+            ->getForm();
 
         $form->handleRequest($request);
 
@@ -66,11 +74,16 @@ class ProductController extends AbstractController
     /**
      * @Route("/product/edit/{id}", name="edit")
      */
-    public function editProd(Request $request): Response
+    public function editProduct(Request $request): Response
     {
         $id = $request->get('id');
-        $prod = $this->getDoctrine()->getRepository(Prod::class)->find($id);
-        $form = $this->createForm(ProductType::class, $prod);
+        $product = $this->getDoctrine()->getRepository(Prod::class)->find($id);
+
+        $form = $this->createFormBuilder($product)
+            ->add('name', TextType::class)
+            ->add('price', NumberType::class)
+            ->add('description', TextareaType::class)
+            ->getForm();
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -84,7 +97,7 @@ class ProductController extends AbstractController
         }
 
         return $this->render('product/edit.html.twig', [
-            'prod' => $prod,
+            'prod' => $product,
             'form' => $form->createView(),
         ]);
     }
@@ -97,21 +110,21 @@ class ProductController extends AbstractController
         $cartAr = $this->session->get('cart_item');
 
         $qty = $request->get('qty');
-        $prodId = $request->get('id');
+        $productId = $request->get('id');
 
-        $prod = $this->getDoctrine()->getRepository(Prod::class)->find($prodId);
+        $prod = $this->getDoctrine()->getRepository(Prod::class)->find($productId);
 
-        if (isset($cartAr[$prodId])) {
-            $qty = $cartAr[$prodId]['prod_qty'] + $qty;
+        if (isset($cartAr[$productId])) {
+            $qty = $cartAr[$productId]['prod_qty'] + $qty;
 
-            $cartAr[$prodId]['prod_qty']   = $qty;
-            $cartAr[$prodId]['item_total'] = $prod->getPrice() * $qty;
+            $cartAr[$productId]['prod_qty']   = $qty;
+            $cartAr[$productId]['item_total'] = $prod->getPrice() * $qty;
         } else {
-            $cartAr[$prodId]['prod_id']    = $prodId;
-            $cartAr[$prodId]['prod_name']  = $prod->getName();
-            $cartAr[$prodId]['prod_qty']   = $qty;
-            $cartAr[$prodId]['unit_price'] = $prod->getPrice();
-            $cartAr[$prodId]['item_total'] = $prod->getPrice() * $qty;
+            $cartAr[$productId]['prod_id']    = $productId;
+            $cartAr[$productId]['prod_name']  = $prod->getName();
+            $cartAr[$productId]['prod_qty']   = $qty;
+            $cartAr[$productId]['unit_price'] = $prod->getPrice();
+            $cartAr[$productId]['item_total'] = $prod->getPrice() * $qty;
         }
 
         $this->session->set('cart_item', $cartAr);

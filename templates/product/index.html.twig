@@ -20,22 +20,22 @@
                 </tr>
             </thead>
             <tbody>
-                {% for prod in prods %}
+                {% for product in products %}
                     {{ form_start(form, {'action': path('add_to_cart'), 'method': 'POST'}) }}
                         <tr>
-                            <td>{{ prod.name }}</td>
-                            <td>{{ prod.description }}</td>
-                            <td>{{ prod.price|number_format(2, '.', ',') }}</td>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.description }}</td>
+                            <td>{{ product.price|number_format(2, '.', ',') }}</td>
                             <td class="text-center"><input type="number" id="qty" name="qty" required="required"></td>
                             <td class="text-center">
-                                <a href="{{ path('edit', {id: prod.id}) }}" class="btn btn-sm btn-primary">
+                                <a href="{{ path('edit', {id: product.id}) }}" class="btn btn-sm btn-primary">
                                     <i class="fa fa-edit" aria-hidden="true"></i> Edit
                                 </a>
                                 <button type="submit" class="btn btn-sm btn-primary btn-success">
                                     <i class="fa fa-save" aria-hidden="true"></i> Add to cart
                                 </button>
                             </td>
-                            <input type="hidden" id="prod_id" name="id" value="{{prod.id}}">
+                            <input type="hidden" id="prod_id" name="id" value="{{product.id}}">
                         </tr>
                     {{ form_end(form) }}
                 {% endfor %}

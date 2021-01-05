@@ -1,0 +1,7 @@
+body {
+    background-color: lightgray;
+}
+
+.form-group.required .control-label:after {
+    content:"*";color:red;
+}
