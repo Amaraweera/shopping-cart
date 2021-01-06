@@ -14,7 +14,7 @@
                 <tr>
                     <th scope="col">Name</th>
                     <th scope="col">Description</th>
-                    <th scope="col">Unit Price(LKR)</th>
+                    <th scope="col" class="text-center">Unit Price(LKR)</th>
                     <th scope="col" class="text-center">Qty</th>
                     <th scope="col" class="text-center">Action</th>
                 </tr>
@@ -25,7 +25,7 @@
                         <tr>
                             <td>{{ product.name }}</td>
                             <td>{{ product.description }}</td>
-                            <td>{{ product.price|number_format(2, '.', ',') }}</td>
+                            <td class="text-center">{{ product.price|number_format(2, '.', ',') }}</td>
                             <td class="text-center"><input type="number" id="qty" name="qty" required="required"></td>
                             <td class="text-center">
                                 <a href="{{ path('edit', {id: product.id}) }}" class="btn btn-sm btn-primary">
@@ -34,6 +34,9 @@
                                 <button type="submit" class="btn btn-sm btn-primary btn-success">
                                     <i class="fa fa-save" aria-hidden="true"></i> Add to cart
                                 </button>
+                                <a href="{{ path('delete', {id: product.id}) }}" class="btn btn-sm btn-danger">
+                                    <i class="fa fa-edit" aria-hidden="true"></i> Delete
+                                </a>
                             </td>
                             <input type="hidden" id="prod_id" name="id" value="{{product.id}}">
                         </tr>
@@ -86,6 +89,36 @@
                         </a>
                     </td>
                     </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        <h3>Orders</h3>
+        <table class="table table-striped table-middle-aligned">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-center">Order id</th>
+                    <th scope="col" class="text-center">Status</th>
+                    <th scope="col" class="text-center">Date</th>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody>
+                {% if orders is defined %}
+                    {% set total = 0 %}
+                    {% for order in orders %}
+                        <tr>
+                            <td class="text-center">{{order.id}}</td>
+                            <td class="text-center">{{ order.status == "A" ? "Active" : "Inactive" }}</td>
+                            <td class="text-center">{{order.date|date("m/d/Y")}}</td>
+                            <td>
+                                <a href="{{ path('detail',{id:order.id})}}" class="btn btn-sm btn-primary">
+                                    More
+                                </a>
+                            </td>
+                        </tr>
+                     
+                    {% endfor %}
+                   
                 {% endif %}
             </tbody>
         </table>

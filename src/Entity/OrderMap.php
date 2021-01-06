@@ -20,45 +20,22 @@ class OrderMap
     /**
      * @ORM\Column(type="integer")
      */
-    private $order_id;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $product_id;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
     private $quantity;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Order", inversedBy="orderMap")
+     */
+    private $order;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Product", inversedBy="orderMap")
+     */
+    private $product;
+
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getOrderId(): ?int
-    {
-        return $this->order_id;
-    }
-
-    public function setOrderId(int $order_id): self
-    {
-        $this->order_id = $order_id;
-
-        return $this;
-    }
-
-    public function getProductId(): ?int
-    {
-        return $this->product_id;
-    }
-
-    public function setProductId(int $product_id): self
-    {
-        $this->product_id = $product_id;
-
-        return $this;
     }
 
     public function getQuantity(): ?int
@@ -69,6 +46,30 @@ class OrderMap
     public function setQuantity(int $quantity): self
     {
         $this->quantity = $quantity;
+
+        return $this;
+    }
+
+    public function getOrder(): ?Order
+    {
+        return $this->order;
+    }
+
+    public function setOrder(?Order $order): self
+    {
+        $this->order = $order;
+
+        return $this;
+    }
+
+    public function getProduct(): ?Product
+    {
+        return $this->product;
+    }
+
+    public function setProduct(?Product $product): self
+    {
+        $this->product = $product;
 
         return $this;
     }

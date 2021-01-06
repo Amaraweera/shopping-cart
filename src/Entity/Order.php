@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\OrderRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -27,6 +29,16 @@ class Order
      * @ORM\Column(type="datetime")
      */
     private $date;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\OrderMap", mappedBy="order")
+     */
+    private $order;
+
+    public function __construct()
+    {
+        $this->order = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -53,6 +65,36 @@ class Order
     public function setDate(\DateTimeInterface $date): self
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|OrderMap[]
+     */
+    public function getOrder(): Collection
+    {
+        return $this->order;
+    }
+
+    public function addOrder(OrderMap $order): self
+    {
+        if (!$this->order->contains($order)) {
+            $this->order[] = $order;
+            $order->setOrder($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOrder(OrderMap $order): self
+    {
+        if ($this->order->removeElement($order)) {
+            // set the owning side to null (unless already changed)
+            if ($order->getOrder() === $this) {
+                $order->setOrder(null);
+            }
+        }
 
         return $this;
     }
