@@ -1,2 +1,2 @@
 # shopping-cart
-Simple shopping cart - synfony
+Simple shopping cart - symfony
