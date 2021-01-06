@@ -65,12 +65,12 @@
                     {% set total = 0 %}
                     {% for cartItem in cart %}
                         <tr>
-                            <td>{{cartItem.prod_name}}</td>
+                            <td>{{cartItem.product_name}}</td>
                             <td class="text-center">{{cartItem.unit_price|number_format(2, '.', ',')}}</td>
-                            <td class="text-center">{{cartItem.prod_qty}}</td>
+                            <td class="text-center">{{cartItem.quantity}}</td>
                             <td class="text-center">{{cartItem.item_total|number_format(2, '.', ',')}}</td>
                             <td>
-                                <a href="{{ path('delete_item', {id: cartItem.prod_id,action: 'delete_item'}) }}" class="btn btn-sm btn-danger">
+                                <a href="{{ path('delete_item', {id: cartItem.product_id,action: 'delete_item'}) }}" class="btn btn-sm btn-danger">
                                 <i class="fa fa-edit" aria-hidden="true"></i> X
                             </a>
                             </td>
@@ -108,7 +108,7 @@
                     {% for order in orders %}
                         <tr>
                             <td class="text-center">{{order.id}}</td>
-                            <td class="text-center">{{ order.status == "A" ? "Active" : "Inactive" }}</td>
+                            <td class="text-center">{{order.status == "A" ? "Active" : "Inactive" }}</td>
                             <td class="text-center">{{order.date|date("m/d/Y")}}</td>
                             <td>
                                 <a href="{{ path('detail',{id:order.id})}}" class="btn btn-sm btn-primary">

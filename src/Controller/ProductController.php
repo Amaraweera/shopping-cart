@@ -9,7 +9,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Product;
 use App\Entity\Order;
 use App\Entity\OrderMap;
-use App\Form\ProductType;
 use DateTime;
 use Exception;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -27,21 +26,21 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @Route("/", name="product")
+     * @Route("/", methods="GET", name="product")
      */
     public function index(): Response
     {
-        $products = $this->getDoctrine()->getRepository(Product::class)->findAll();
+        $products = $this->getDoctrine()->getRepository(Product::class)
+            ->findAll();
         $orders = $this->getDoctrine()->getRepository(Order::class)->findAll();
-
-        // dump($orders);
-        // die();
 
         $form = $this->createFormBuilder([
             'action' => $this->generateUrl('add_to_cart'),
             'method' => 'GET',
         ])->getForm();
 
+        // print_r($this->session->get('cart_item'));
+        // exit;
         return $this->render('product/index.html.twig', [
             'form'     =>  $form->createView(),
             'products' => $products,
@@ -51,7 +50,7 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @Route("/product/add", name="add")
+     * @Route("/product/add", methods="POST", name="add")
      */
     public function addProduct(Request $request): Response
     {
@@ -81,12 +80,13 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @Route("/product/edit/{id}", name="edit")
+     * @Route("/product/edit/{id}", methods="GET", name="edit")
      */
     public function editProduct(Request $request): Response
     {
-        $id = $request->get('id');
-        $product = $this->getDoctrine()->getRepository(Product::class)->find($id);
+        $id      = $request->get('id');
+        $product = $this->getDoctrine()->getRepository(Product::class)
+            ->find($id);
 
         $form = $this->createFormBuilder($product)
             ->add('name', TextType::class)
@@ -112,49 +112,49 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @Route("/product/addToCart", name="add_to_cart")
+     * @Route("/product/addToCart", methods="POST", name="add_to_cart")
      */
     public function addToCart(Request $request): Response
     {
-        $cartAr = $this->session->get('cart_item');
+        $cart = $this->session->get('cart_item');
 
-        $qty = $request->get('qty');
+        $quantity = $request->get('qty');
         $productId = $request->get('id');
 
-        $prod = $this->getDoctrine()->getRepository(Product::class)->find($productId);
+        $prod = $this->getDoctrine()->getRepository(Product::class)
+            ->find($productId);
 
-        if (isset($cartAr[$productId])) {
-            $qty = $cartAr[$productId]['prod_qty'] + $qty;
+        if (isset($cart[$productId])) {
+            $qty = $cart[$productId]['product_qty'] + $quantity;
 
-            $cartAr[$productId]['prod_qty']   = $qty;
-            $cartAr[$productId]['item_total'] = $prod->getPrice() * $qty;
+            $cart[$productId]['product_qty']   = $quantity;
+            $cart[$productId]['item_total']    = $prod->getPrice() * $qty;
         } else {
-            $cartAr[$productId]['prod_id']    = $productId;
-            $cartAr[$productId]['prod_name']  = $prod->getName();
-            $cartAr[$productId]['prod_qty']   = $qty;
-            $cartAr[$productId]['unit_price'] = $prod->getPrice();
-            $cartAr[$productId]['item_total'] = $prod->getPrice() * $qty;
+            $cart[$productId]['product_id']    = $productId;
+            $cart[$productId]['product_name']  = $prod->getName();
+            $cart[$productId]['quantity']   = $quantity;
+            $cart[$productId]['unit_price']    = $prod->getPrice();
+            $cart[$productId]['item_total']    = $prod->getPrice() * $quantity;
         }
 
-        $this->session->set('cart_item', $cartAr);
+        $this->session->set('cart_item', $cart);
 
         return $this->redirectToRoute('product');
     }
 
     /**
-     * @Route("/product/deleteCartItem/{id}/{action}", name="delete_item")
+     * @Route("/product/deleteCartItem/{id}/{action}", methods="GET", name="delete_item")
      */
     public function deleteCartItem(Request $request): Response
     {
         $action = $request->get('action');
-        $id = $request->get('id');
-
-        $cartAr = $this->session->get('cart_item');
+        $id     = $request->get('id');
+        $cart   = $this->session->get('cart_item');
 
         // if action is "delete_item" delete one item else delete all items
         if ($action === 'delete_item') {
-            unset($cartAr[$id]);
-            $this->session->set('cart_item', $cartAr);
+            unset($cart[$id]);
+            $this->session->set('cart_item', $cart);
         } else
             $this->session->remove('cart_item');
 
@@ -162,23 +162,24 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @Route("/product/delete/{id}", name="delete")
+     * @Route("/product/delete/{id}", methods="GET", name="delete")
      */
     public function delete(Request $request): Response
     {
         $id     = $request->get('id');
-        $cartAr = $this->session->get('cart_item');
+        $cart   = $this->session->get('cart_item');
         try {
-            $product       = $this->getDoctrine()->getRepository(Product::class)->find($id);
+            $product = $this->getDoctrine()->getRepository(Product::class)
+                ->find($id);
             $entityManager = $this->getDoctrine()->getManager();
 
             $entityManager->remove($product);
             $entityManager->flush();
 
             // Delete product from cart
-            if (isset($cartAr[$id])) {
-                unset($cartAr[$id]);
-                $this->session->set('cart_item', $cartAr);
+            if (isset($cart[$id])) {
+                unset($cart[$id]);
+                $this->session->set('cart_item', $cart);
             }
         } catch (\Exception $e) {
             return $this->redirectToRoute('product');
@@ -188,7 +189,7 @@ class ProductController extends AbstractController
     }
 
     /**
-     * @Route("/product/checkout", name="checkout")
+     * @Route("/product/checkout", methods="GET", name="checkout")
      */
     public function checkout(Request $request): Response
     {
@@ -204,6 +205,7 @@ class ProductController extends AbstractController
             // Place order
             $order->setStatus("A"); // Active - A, I - Inactive
             $order->setDate(new DateTime());
+
             $entityManager->persist($order);
 
             // Insert order items
@@ -212,11 +214,11 @@ class ProductController extends AbstractController
 
                 // Get product object 
                 $product = $this->getDoctrine()->getRepository(Product::class)
-                    ->find($cartItem['prod_id']);
+                    ->find($cartItem['product_id']);
 
                 $orderMap->setProduct($product);
                 $orderMap->setOrder($order);
-                $orderMap->setQuantity($cartItem['prod_qty']);
+                $orderMap->setQuantity($cartItem['quantity']);
 
                 $entityManager->persist($orderMap);
             }
@@ -227,15 +229,16 @@ class ProductController extends AbstractController
             $entityManager->getConnection()->rollBack();
             throw $e;
         }
+
         return $this->redirectToRoute('product');
     }
 
     /**
-     * @Route("/order/detail/{id}", name="detail")
+     * @Route("/order/detail/{id}", methods="GET", name="detail")
      */
     public function orderDetail(Request $request): Response
     {
-        $id = $request->get('id');
+        $id         = $request->get('id');
         $orderItems = $this->getDoctrine()
             ->getRepository(OrderMap::class)->findBy(
                 ['order' => $id]
