@@ -10,9 +10,9 @@
             <thead>
                 <tr>
                     <th scope="col">Product</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col" class="text-center">Total</th>
+                    <th class="text-center" scope="col">Price</th>
+                    <th class="text-center" scope="col">Quantity</th>
+                    <th class="text-center" scope="col" class="text-center">Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -20,9 +20,17 @@
                 {% for item in orderItems %}
                     <tr>
                         <td>{{item.product.name}}</td>
-                        <td class="text-center">{{item.product.price|number_format(2, '.', ',')}}</td>
+                        <td class="text-center">
+                            {{item.product.price|number_format(2, '.', ',')}}
+                        </td>
                         <td class="text-center">{{item.quantity}}</td>
-                        <td class="text-center">{{item.product.price|number_format(2, '.', ',') * item.quantity}}</td>
+                        <td class="text-center">
+                            {{
+                                item.product.price|number_format(2, '.', ',') 
+                                * 
+                                item.quantity
+                            }}
+                        </td>
                     </tr>
                 {% set total = total + (item.product.price * item.quantity) %}
                 {% endfor %}

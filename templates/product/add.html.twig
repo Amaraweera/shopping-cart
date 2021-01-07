@@ -4,34 +4,77 @@
 {% block body %}
 <div class="col-sm-8">
 <h3><small>Add Product</small></h3>
-{{ form_start(form) }}
+{{ form_start(form, {'attr': {'id': 'add_product'}}) }}
     <div class="form-group required row">   
-        {{ form_label(form.name, 'Product Name', {'label_attr': {'class': 'control-label col-sm-2'}}) }}
+        {{ 
+            form_label
+            (
+                form.name, 'Product Name',
+                {'label_attr': {'class': 'control-label col-sm-2'}},
+                {'label_attr': { 'disabled': 'disabled'}}
+            ) 
+        }}
         <div class="col-sm-10">
-            {{ form_widget(form.name, {'attr': {'class': 'form-control js-form'}}) }}
+            {{ 
+                form_widget
+                (
+                    form.name, 
+                    {'attr': 
+                        {
+                            'class': 'form-control js-form',
+                            'onkeyup':'validName()'
+                        }
+                    }
+                ) 
+            }}
             {{ form_errors(form.name) }}
         </div>
     </div>
     <div class="form-group required row">
-        {{ form_label(form.price, 'Product Price', {'label_attr': {'class': 'control-label col-sm-2'}}) }}
+        {{ 
+            form_label
+            (
+                form.price, 'Product Price', 
+                {'label_attr': {'class': 'control-label col-sm-2'}}
+            ) 
+        }}
         <div class="col-sm-10">
-            {{ form_widget(form.price, {'attr': {'class': 'form-control js-form'}}) }}
+            {{
+                form_widget
+                (
+                    form.price,
+                    {'attr': {'class': 'form-control js-form'}}
+                )
+            }}
             {{ form_errors(form.price) }}
         </div>
     </div>
     <div class="form-group row">
-        {{ form_label(form.description, 'Product Description', {'label_attr': {'class': 'col-sm-2'}}) }}
+        {{ 
+            form_label
+            (
+                form.description,
+                'Product Description', 
+                {'label_attr': {'class': 'col-sm-2'}}
+            )
+        }}
         <div class="col-sm-10">
-            {{ form_widget(form.description, {'attr': {'class': 'form-control js-form'}}) }}
+            {{ 
+                form_widget
+                (
+                    form.description, 
+                    {'attr': {'class': 'form-control js-form'}}
+                )
+            }}
         </div>
     </div>
     <div class="col-sm-10">
         <div class="form-group row">
-            <button type="submit" class="btn btn-sm btn-success">
-                <i class="fa fa-save" aria-hidden="true"></i> Add Product
-            </button>
-            <button type="button" class="btn btn-sm btn-danger ml-1 js-clear-btn">
-                <i class="fa fa-save" aria-hidden="true"></i> Clear
+            <input class="submit btn btn-sm btn-success" type="submit" value="Submit">
+            <button 
+                type="button" 
+                class="btn btn-sm btn-danger ml-1 js-clear-btn">
+                Clear
             </button>
             <a href="{{ path('product')}}" class="btn btn-sm btn-primary ml-1">
                 Back
@@ -49,6 +92,38 @@
         $( ".js-clear-btn" ).click(function() {
            $(".js-form").val("");
         });
+
+        $("#add_product").validate({
+            rules: {
+                "form[name]": {
+                    required: true
+                },
+                "form[price]": {
+                    required: true,
+                    number: true
+                }
+            }        
+        });
     });
+
+    function validName(){
+        var name = document.getElementById("form_name").value;
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                var jsonObj = JSON.parse(this.responseText);
+                if(jsonObj.isExsist){
+                    alert("Plase select differnt name");
+                    document.getElementsByClassName("submit").setAttribute("disabled","disabled");
+                }else{
+                    document.getElementsByClassName("submit").setAttribute("disabled","");
+                }
+            }
+        };
+        xhttp.open("GET", "/product/validateName/"+name,true);
+        xhttp.send();
+        
+    }
 </script>
 {% endblock %}

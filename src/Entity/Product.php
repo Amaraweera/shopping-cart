@@ -89,9 +89,6 @@ class Product
         return $this;
     }
 
-    /**
-     * @return Collection|OrderMap[]
-     */
     public function getOrderMap(): Collection
     {
         return $this->orderMap;

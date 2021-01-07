@@ -7,7 +7,7 @@
     <div class="col-sm-12">
         <h3>Product List</h3>
         <a href="{{ path('add') }}" class="btn btn-sm btn-primary">
-                <i class="fa fa-edit" aria-hidden="true"></i> Add Product
+            <i class="fa fa-edit" aria-hidden="true"></i> Add Product
         </a>
         <table class="table table-striped table-middle-aligned">
             <thead>
@@ -21,24 +21,46 @@
             </thead>
             <tbody>
                 {% for product in products %}
-                    {{ form_start(form, {'action': path('add_to_cart'), 'method': 'POST'}) }}
+                    {{ form_start(
+                        form, 
+                        {'action': path('add_to_cart'), 'method': 'POST'}) 
+                    }}
                         <tr>
                             <td>{{ product.name }}</td>
                             <td>{{ product.description }}</td>
-                            <td class="text-center">{{ product.price|number_format(2, '.', ',') }}</td>
-                            <td class="text-center"><input type="number" id="qty" name="qty" required="required"></td>
                             <td class="text-center">
-                                <a href="{{ path('edit', {id: product.id}) }}" class="btn btn-sm btn-primary">
-                                    <i class="fa fa-edit" aria-hidden="true"></i> Edit
-                                </a>
-                                <button type="submit" class="btn btn-sm btn-primary btn-success">
-                                    <i class="fa fa-save" aria-hidden="true"></i> Add to cart
-                                </button>
-                                <a href="{{ path('delete', {id: product.id}) }}" class="btn btn-sm btn-danger">
-                                    <i class="fa fa-edit" aria-hidden="true"></i> Delete
-                                </a>
+                                {{ product.price|number_format(2, '.', ',') }}
                             </td>
-                            <input type="hidden" id="prod_id" name="id" value="{{product.id}}">
+                            <td class="text-center">
+                                <input 
+                                    type     ="number" 
+                                    id       ="quantity" 
+                                    name     ="quantity" 
+                                    required ="required"
+                                >
+                            </td>
+                            <td class="text-center">
+                                <a 
+                                    href="{{path('edit', {id: product.id})}}" 
+                                    class="btn btn-sm btn-primary">
+                                    Edit
+                                </a>
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-sm btn-primary btn-success">
+                                    Add to cart
+                                </button>
+                                <button onClick="deleteProduct({{product.id}})"
+                                    class="btn btn-sm btn-danger">
+                                    Delete
+                                </button>
+                            </td>
+                            <input 
+                                type="hidden" 
+                                id="prod_id" 
+                                name="id" 
+                                value="{{product.id}}"
+                            >
                         </tr>
                     {{ form_end(form) }}
                 {% endfor %}
@@ -46,8 +68,10 @@
         </table>
         <h3>Cart</h3>
         <span>
-            <a href="{{ path('delete_item', {id: 0,action: 'delete_all'}) }}" class="btn btn-sm btn-danger pull-right">
-                <i class="fa fa-edit" aria-hidden="true"></i> Empty Cart
+            <a 
+                href="{{path('delete_item', {id: 0,action: 'delete_all'})}}" 
+                class="btn btn-sm btn-danger pull-right">
+                Empty Cart
             </a>
         </span>
         <table class="table table-striped table-middle-aligned">
@@ -66,25 +90,39 @@
                     {% for cartItem in cart %}
                         <tr>
                             <td>{{cartItem.product_name}}</td>
-                            <td class="text-center">{{cartItem.unit_price|number_format(2, '.', ',')}}</td>
+                            <td class="text-center">
+                                {{
+                                    cartItem.unit_price|number_format(2, '.', ',')
+                                }}
+                            </td>
                             <td class="text-center">{{cartItem.quantity}}</td>
-                            <td class="text-center">{{cartItem.item_total|number_format(2, '.', ',')}}</td>
+                            <td class="text-center">
+                                {{
+                                    cartItem.item_total|number_format(2, '.', ',')
+                                }}
+                            </td>
                             <td>
-                                <a href="{{ path('delete_item', {id: cartItem.product_id,action: 'delete_item'}) }}" class="btn btn-sm btn-danger">
-                                <i class="fa fa-edit" aria-hidden="true"></i> X
-                            </a>
+                                <button
+                                    onclick="deleteCartItem({{cartItem.product_id}})"
+                                    class="btn btn-sm btn-danger">
+                                X
+                            </button>
                             </td>
                         </tr>
                         {% set total = total + cartItem.item_total %}
                     {% endfor %}
                     <tr>
                         <td colSpan="3">Total</td>
-                        <td class="text-center">{{ total|number_format(2, '.', ',') }}</td>
+                        <td class="text-center">
+                            {{ total|number_format(2, '.', ',') }}
+                        </td>
                         <td></td>
                     </tr>
                     <tr>
                     <td colSpan="5"> 
-                        <a href="{{ path('checkout')}}" class="btn btn-sm btn-primary">
+                        <a 
+                            href="{{ path('checkout')}}" 
+                            class="btn btn-sm btn-primary">
                             Checkout
                         </a>
                     </td>
@@ -108,10 +146,18 @@
                     {% for order in orders %}
                         <tr>
                             <td class="text-center">{{order.id}}</td>
-                            <td class="text-center">{{order.status == "A" ? "Active" : "Inactive" }}</td>
-                            <td class="text-center">{{order.date|date("m/d/Y")}}</td>
+                            <td 
+                                class="text-center"
+                            >
+                                {{order.status == "A" ? "Active" : "Inactive"}}
+                            </td>
+                            <td class="text-center">
+                                {{order.date|date("m/d/Y")}}
+                            </td>
                             <td>
-                                <a href="{{ path('detail',{id:order.id})}}" class="btn btn-sm btn-primary">
+                                <a 
+                                    href="{{ path('detail',{id:order.id})}}" 
+                                    class="btn btn-sm btn-primary">
                                     More
                                 </a>
                             </td>
@@ -124,4 +170,45 @@
         </table>
     </div>
 </div>
+<script>
+    function deleteProduct(id){
+        if (confirm("Do you want to delete this product")) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var jsonObj = JSON.parse(this.responseText);
+                    if(jsonObj.isDelete){
+                        location.reload();
+                    }else{
+                        alert("Some thing went wrong");
+                    }
+                }
+            };
+            xhttp.open("GET", "/product/delete/"+id,true);
+            xhttp.send();
+        } else {
+            txt = "You pressed Cancel!";
+        }
+    }
+
+    function deleteCartItem(id){
+        if (confirm("Do you want to delete this item from cart")) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var jsonObj = JSON.parse(this.responseText);
+                    if(jsonObj.isDelete){
+                        location.reload();
+                    }else{
+                        alert("Some thing went wrong");
+                    }
+                }
+            };
+            xhttp.open("GET", "/product/deleteCartItem/"+id+"/delete_item",true);
+            xhttp.send();
+        } else {
+            txt = "You pressed Cancel!";
+        }
+    }
+</script>
 {% endblock %}
