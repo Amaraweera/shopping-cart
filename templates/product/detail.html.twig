@@ -10,9 +10,11 @@
             <thead>
                 <tr>
                     <th scope="col">Product</th>
-                    <th class="text-center" scope="col">Price</th>
+                    <th class="text-center" scope="col">Price LKR</th>
                     <th class="text-center" scope="col">Quantity</th>
-                    <th class="text-center" scope="col" class="text-center">Total</th>
+                    <th class="text-center" scope="col" class="text-center">
+                        Total LKR
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -26,9 +28,9 @@
                         <td class="text-center">{{item.quantity}}</td>
                         <td class="text-center">
                             {{
-                                item.product.price|number_format(2, '.', ',') 
+                                (item.product.price|number_format(2, '.', ',') 
                                 * 
-                                item.quantity
+                                item.quantity)|number_format(2, '.', ',')
                             }}
                         </td>
                     </tr>
@@ -36,7 +38,9 @@
                 {% endfor %}
                 <tr>
                     <td colSpan="3">Total</td>
-                    <td class="text-center">{{total}}</td>
+                    <td class="text-center">
+                        {{total|number_format(2, '.', ',')}}
+                    </td>
                 </tr>
             </tbody>
         </table>
